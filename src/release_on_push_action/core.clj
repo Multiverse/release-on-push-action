@@ -21,8 +21,8 @@
     false))
 
 (defn assert-valid-bump-version-scheme [bump-version-scheme]
-  (when-not (contains? #{"major" "minor" "patch" "norelease"} bump-version-scheme)
-    (throw (ex-info (str "Invalid bump-version-scheme. Expected one of major|minor|patch|norelease. Got: " bump-version-scheme) {:bump-version-scheme bump-version-scheme})))
+  (when-not (contains? #{"major" "minor" "patch" "norelease" "promote"} bump-version-scheme)
+    (throw (ex-info (str "Invalid bump-version-scheme. Expected one of major|minor|patch|norelease|promote. Got: " bump-version-scheme) {:bump-version-scheme bump-version-scheme})))
   bump-version-scheme)
 
 (defn context-from-env
@@ -97,7 +97,8 @@
                        :minor [major (safe-inc minor) 0]
                        :patch [major minor (safe-inc patch)]
                        :norelease [major minor patch]
-                       :prerelease [major minor patch])]
+                       :prerelease [major minor patch]
+                       :promote [major minor patch])]
     (str (str/join "." next-version) (if prerelease-version (str "-" prerelease-version)))))
 
 (defn prerelease-bump [version prerelease-tag version-changed]
