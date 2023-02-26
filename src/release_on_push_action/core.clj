@@ -42,6 +42,7 @@
    :input/release-name  (System/getenv "INPUT_RELEASE_NAME") ;defaults to "<RELEASE_TAG>", see default in action.yml
    :input/use-github-release-notes (Boolean/parseBoolean (System/getenv "INPUT_USE_GITHUB_RELEASE_NOTES"))
    :input/prerelease-tag (System/getenv "INPUT_PRERELEASE_TAG")
+   :input/skip-prs      (Boolean/parseBoolean (System/getenv "INPUT_SKIP_PRS"))
    :bump-version-scheme (assert-valid-bump-version-scheme
                          (try
                            (getenv-or-throw "INPUT_BUMP_VERSION_SCHEME")
@@ -58,7 +59,7 @@
   (->> related-prs (map :labels) flatten (map :name) set))
 
 (defn is-prerelease? [context related-data]
-  (let [labels (get-labels (:related-prs related-data))]
+  (let [labels (if (:input/skip-prs context) { :labels () } (get-labels (:related-prs related-data)))]
     (contains? labels "prerelease")))
 
 (defn fetch-related-data [context]
@@ -73,7 +74,7 @@
                               (:body (github/fetch-commit (assoc context :sha tag))))}))
 
 (defn bump-version-scheme [context related-data]
-  (let [labels (get-labels (:related-prs related-data))]
+  (let [labels (if (:input/skip-prs context) { :labels () } (get-labels (:related-prs related-data)))]
     (cond
       (contains? labels "release:major") :major
       (contains? labels "release:minor") :minor
