@@ -198,6 +198,7 @@
     (binding [*out* out]
       (println (prepare-key-value "tag_name" (:tag_name release-data)))
       (println (prepare-key-value "version" (:name release-data)))
+      (println (prepare-key-value "prerelease" (str (:prerelease release-data))))
       (println (prepare-key-value "body" (:body release-data))))))
 
 (defn -main [& args]
